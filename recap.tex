@@ -18,6 +18,7 @@
 \usepackage{fancyvrb}
 \setminted[scala]{fontsize=\scriptsize,baselinestretch=1,obeytabs=true, tabsize=2}
 \usepackage[ddmmyyyy]{datetime}
+
 \renewcommand{\dateseparator}{}
 %\renewcommand{\thefootnote}{\fnsymbol{footnote}}
 \newcommand{\version}{1}
@@ -74,16 +75,75 @@
 \frame{\titlepage}
 %/////////
 
-
 %===============================================================================
 \section{Introduction}
+\begin{frame}{Activities -- One slide}
+\begin{itemize}
+	\item \bold{Main idea}: spatio-temporal tracking of a natural phenomenon
+	\begin{itemize}
+		\item Generation of synthetic data (moving boids)
+		\item Studying of spatio-temporal neural network models (forecast)
+		\begin{itemize}
+			\item Graph Neural Networks
+			\item Reccurrent Neural Networks
+			\item \emph{Recurrent Graph Neural Networks}
+		\end{itemize}
+		\item Training GNNs through PyTorch and data generated from Alchemist
+		\item Integrate Neural networks with Aggregate Computing
+		\item Use forecast to compute the best path for nodes
+	\end{itemize}
+	\item \bold{Clustering}: continue the idea of swarm-based clustering -- avoid the leader election phase
+	\begin{itemize}
+		\item Inside the cluster, compute the leader (bounded leader election)
+	\end{itemize}
+\end{itemize}
+\end{frame}
 %===============================================================================
 
 %===============================================================================
 \section{Graph Neural Networks}
 %===============================================================================
+\begin{frame}{Graph Neural Networks}
+\begin{alertblock}{Definition}
+	A graph neural network (GNN)~\scite{scarselli2008graph} is a neural network that operates on \textit{graphs}
+\end{alertblock}
+\begin{itemize}
+	\item \bold{Tasks}
+	\begin{itemize}
+		\item Node classification: given a graph $G=(V,E)$ and a set of labels $X$, predict the label of each node $v \in V$
+		\item Link regression: given a graph $G=(V,E)$ and a set of labels $X$, predict the label of each edge $(u,v) \in E$
+		\item Graph classification/regression: given a graph $G=(V,E)$ and a set of labels $X$, predict the label of the graph
+	\end{itemize}
+	\item \bold{Applications}
+	\begin{itemize}
+		\item \emph{Traffic forecast}
+		\item Physics simulations~\scite{jiang2022graph}
+		\item Recommandation systems~\scite{wu2020graph}
+		\item Chemistry (Molecular fingerprint, chemical reaction)~\scite{zhou2020graph}
+		\item Stock market~\scite{matsunaga2019exploring}
+		\item Program verification~\scite{NEURIPS2019_49265d24}
+		\item ...
+	\end{itemize}
+\end{itemize}
+\end{frame}
 
-
+\begin{frame}{GNN structure \& dynamics}
+	\begin{itemize}
+		\item \bold{Idea}: iteratively update the node representations 
+		by combining the representations of their neighbors and their own representations
+		\item \bold{K}: layer of GNNs
+		\item \bold{$H^i$}: node representations at layer i ($H^0 = X$)
+		\item each layer:
+		\begin{itemize}
+			\item aggregate the information from the neighbors of each node (\textbf{AGGREGATE} phase) $\sim$ {\lstinline|nbr|}
+			\item update the node representations by combining the aggregated information from neighbors with the current node representations (\textbf{COMBINE}) $\sim$ \lstinline|foldhood|
+		\end{itemize}
+		\item Matematically:
+		\begin{itemize}
+			\item 
+		\end{itemize}
+	\end{itemize}
+\end{frame}
 %===============================================================================
 \section{Aggregate Computing + Neural Networks}
 %===============================================================================
