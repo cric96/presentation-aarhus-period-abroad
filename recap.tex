@@ -16,7 +16,8 @@
 \usepackage{centernot}
 \usepackage{fontawesome}
 \usepackage{fancyvrb}
-\setminted[scala]{fontsize=\scriptsize,baselinestretch=1,obeytabs=true, tabsize=2}
+\usepackage{minted}
+\setminted[scala]{baselinestretch=1,obeytabs=true, tabsize=2}
 \usepackage[ddmmyyyy]{datetime}
 \definecolor{darkcyan}{rgb}{0.0, 0.55, 0.55}
 \renewcommand{\dateseparator}{}
@@ -74,7 +75,6 @@
 %/////////
 \frame{\titlepage}
 %/////////
-
 %===============================================================================
 \section{Introduction}
 \begin{frame}{Activities -- One slide}
@@ -110,7 +110,7 @@
 \begin{itemize}
 	\item Typical organization: \emph{input layer}, \emph{hidden layers}, \emph{output layer}
 	\item Each layer is composed by a set of neurons
-	\item The output of each layer is computed as: $[y = f(\sum_{i=1}^n w_i x_i)]$ where $f$ is the activation function
+	\item The output of each layer is computed as: $y = f(\sum_{i=1}^n w_i x_i)$ where $f$ is the activation function
 	\item The way in which the neurons are connected is called \emph{topology}
 	\item The are several topology types:
 	\begin{itemize}
@@ -175,33 +175,128 @@
 		\item \textbf{COMBINE} could be: \textbf{concatenation}, \textbf{addition}, \textbf{neural network}, etc.
 		\item Several architecture are proposed, changing the \textbf{AGGREGATE} and \textbf{COMBINE} functions:
 		\begin{itemize}
-			\item Graph Convolutional Networks (GCN)~\cite{kipf2016semi}
-			\item Graph SAGE~\cite{hamilton2017inductive}
+			\item Graph Convolutional Networks (GCN)~\scite{kipf2016semi}
+			\item Graph SAGE~\scite{hamilton2017inductive}
 		\end{itemize}
 	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{GNN structure \& dynamics}
+	\centering
 	\includegraphics[width=\textwidth]{img/example-gnn.png}
+
+\end{frame}
+\begin{frame}{GNN: Aggregate Computing perspective}
 	\begin{itemize}
-		\item Aggregate computing execution model perspective:
-		\begin{itemize}
 			\item GNN updates the node representations in a \textbf{parallely} {\textcolor{darkcyan}\faThumbsUp} but globally synchronized {\textcolor{bolognafcred}\faThumbsDown}
 			\begin{itemize}
-				\item[{\textcolor{darkcyan}\faThumbsUp}] Despite that, GNN could be use for distributed computing
+				\item Despite that, GNN could be use for distributed computing {\textcolor{darkcyan}\faThumbsUp}
 			\end{itemize} 
 			\item Stacking several layers of GNNs, lead to several hops of information propagation
 			\begin{itemize}
 				\item Therefore, we could use at most one layer \faArrowRight \, no deep structure for graph representation
 			\end{itemize}
+			\item If we consider node-wise computation, GNNs processing does not depend on neighborhood size {\textcolor{darkcyan}\faThumbsUp}
+			\item \emph{Learning process}: Centralised Training and Decentralised Execution (CTDE) approach:
+			\begin{itemize}
+				\item Gather several `snapshots' of the aggregate systems as a graphs
+				\begin{itemize}
+					\item Features of the nodes: the state of the nodes (sensors, etc.)
+					\item Weight of the edges: distances, metric, neighborhood data, etc.
+				\end{itemize}
+				\item Train a GNN on the gathered graphs
+				\item `Deploy' the GNN on the aggregate systems
+				\begin{itemize}
+					\item Each node executes the GNN locally sharing the same parameters (homegenous behaviour)
+				\end{itemize}
+			\end{itemize}
+			\item Potential limitations:
+			\begin{itemize}
+				\item Synchronized update \faArrowRight \, each node should wait the update of its neighbors
+				\item Dynamic graph: GNN learn structural relation, no temporal relation (e.g., neighborhood changes, etc.)
+			\end{itemize}
 		\end{itemize}
-	\end{itemize}
 \end{frame}
+\begin{frame}[fragile]{Towards Timeseries forecast using GNN}
+\begin{itemize}
+	\item GNN are typically used for static graphs
+	\begin{itemize}
+		\item connection doesn't change over time
+		\item single snapshot of the graph is enough to predict the label
+	\end{itemize}
+	\item Recent works try to use GNN for timeseries prediction \faArrowRight \, spatio temporal neural networks
+	\begin{itemize}
+		\item Distributed controller for robots ~\scite{tolstaya2020learning}
+		\item Trafic forecast~\scite{zhao2019t}
+		\item Weather forecast~\scite{keisler2022forecasting}
+	\end{itemize}
+	\item Simple Idea: stack GNN structure with a recurrent neural network (RNN) -- or network with memory capabilities
+	\item Conceptually, the RNN could be applied in each node performing a local update on its own state
+	\begin{itemize}
+		\item The state depends on the neighborhood since it is the outpud of the GNN
+	\end{itemize}	
+	\centering
+\end{itemize}
+\includegraphics[width=\textwidth]{img/idea.pdf}
 
+\end{frame}
 %===============================================================================
 \section{Aggregate Computing + Neural Networks}
 %===============================================================================
-
+\begin{frame}[fragile, allowframebreaks]{Aggregate Computing \faPlus \, Neural Networks: Integration perspective}
+\begin{itemize} 
+	\item Neural networks can be seen as simple functions
+	\begin{itemize}
+		\item Some of them should be carefully considered (how to deal with time series? how to deal with graphs?)
+	\end{itemize}
+	\item In the following, we consider a general schema in how to applied NNs in AC
+	\item I don't cover the learning process -- I consider that it is already done using an external process
+	\begin{itemize}
+		\item \mintinline{scala}|sense("feature")| get the feature of interest
+		\item \mintinline{scala}|nbrData| get the associated with the weighted neighborhood
+		\item \mintinline{scala}|NN| is the function associated with the neural network
+	\end{itemize}
+\end{itemize}
+\begin{alertblock}{MLP}
+No need to handle time or spatial aspects
+\begin{minted}{scala}
+def main() = NN(sense("feature"))
+\end{minted}
+\end{alertblock}
+\begin{alertblock}{RNN}
+Similarly as MLP, but you need to use \mintinline{scala}|rep| to encode the temporal aspect
+\begin{minted}{scala}
+def main() = 
+	rep(default){
+		memory => NN(sense("feature"), memory)
+	}
+\end{minted}
+\end{alertblock}
+\begin{alertblock}{GNN}
+	In this case case you need to use \mintinline{scala}|nbr| in order to build the local graph-view
+\begin{minted}{scala}
+def main() = 
+	val neighborhoodFeature = includingSelf(nbr(sense("feature")))
+	val neighborhoodWeight = excludingSelf(nbrData)
+	NN(neighborhoodFeature, neighborhoodWeight)
+\end{minted}
+NB! The order of the feature vector and the weigtht should be preserved
+\end{alertblock}
+\begin{alertblock}{GNN \faPlus \, RNN}
+	You need to use \mintinline{scala}|rep| and \mintinline{scala}|nbr| in order to build the local graph-view with memory
+\begin{minted}{scala}
+def main() =
+	rep(default){
+		memory => 
+			val neighborhoodFeature = includingSelf(nbr(sense("feature")))
+			val neighborhoodWeight = excludingSelf(nbrData)
+			val nbrMemory = includingSelf(nbr(memory))
+			NN(neighborhoodFeature, neighborhoodWeight, nbrMemory)
+	}
+\end{minted}
+NB! Some NNs use as input the neighborhood memory information
+\end{alertblock}
+\end{frame}
 
 %===============================================================================
 \section{Use case: spatio temporal forecast + tracking}
