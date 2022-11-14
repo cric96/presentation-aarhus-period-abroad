@@ -18,7 +18,7 @@
 \usepackage{fancyvrb}
 \setminted[scala]{fontsize=\scriptsize,baselinestretch=1,obeytabs=true, tabsize=2}
 \usepackage[ddmmyyyy]{datetime}
-
+\definecolor{darkcyan}{rgb}{0.0, 0.55, 0.55}
 \renewcommand{\dateseparator}{}
 %\renewcommand{\thefootnote}{\fnsymbol{footnote}}
 \newcommand{\version}{1}
@@ -102,6 +102,25 @@
 
 %===============================================================================
 \section{Graph Neural Networks}
+\begin{frame}{Artificial Neural Networks -- Recap}
+\begin{alertblock}{Definition}
+	Collection of units (also called \emph{artificial neuron}) that simulates the behavior of biological neurons
+	connected by weighted edges (also called \emph{synapses}).
+\end{alertblock}
+\begin{itemize}
+	\item Typical organization: \emph{input layer}, \emph{hidden layers}, \emph{output layer}
+	\item Each layer is composed by a set of neurons
+	\item The output of each layer is computed as: $[y = f(\sum_{i=1}^n w_i x_i)]$ where $f$ is the activation function
+	\item The way in which the neurons are connected is called \emph{topology}
+	\item The are several topology types:
+	\begin{itemize}
+		\item Fully connected (MLP): standard neural network, used for classification and regression problem 
+		\item Convolutional: used for image processing
+		\item Recurrent: used for time series prediction
+		\item \bold{Graph Neural Networks}: used for graph processing
+	\end{itemize}
+\end{itemize}
+\end{frame}
 %===============================================================================
 \begin{frame}{Graph Neural Networks}
 \begin{alertblock}{Definition}
@@ -116,13 +135,19 @@
 	\end{itemize}
 	\item \bold{Applications}
 	\begin{itemize}
-		\item \emph{Traffic forecast}
+		\item \emph{Representation learning}
+		\item \emph{Traffic forecast}~\scite{jiang2022graph}
 		\item Physics simulations~\scite{jiang2022graph}
 		\item Recommandation systems~\scite{wu2020graph}
 		\item Chemistry (Molecular fingerprint, chemical reaction)~\scite{zhou2020graph}
 		\item Stock market~\scite{matsunaga2019exploring}
 		\item Program verification~\scite{NEURIPS2019_49265d24}
 		\item ...
+	\end{itemize}
+	\item Amazing gentle introduction: 
+	\begin{itemize}
+		\item \url{https://distill.pub/2021/gnn-intro/}
+		\item \url{https://tkipf.github.io/graph-convolutional-networks/}
 	\end{itemize}
 \end{itemize}
 \end{frame}
@@ -135,15 +160,44 @@
 		\item \bold{$H^i$}: node representations at layer i ($H^0 = X$)
 		\item each layer:
 		\begin{itemize}
-			\item aggregate the information from the neighbors of each node (\textbf{AGGREGATE} phase) $\sim$ {\lstinline|nbr|}
-			\item update the node representations by combining the aggregated information from neighbors with the current node representations (\textbf{COMBINE}) $\sim$ \lstinline|foldhood|
+			\item aggregate the information from the neighbors of each node (\textbf{AGGREGATE} phase) $\sim$ \bold{\lstinline|nbr|}
+			\item update the node representations by combining the aggregated information from neighbors with the current node representations (\textbf{COMBINE}) $\sim$ \bold{\lstinline|foldhood|}
 		\end{itemize}
 		\item Matematically:
+			$$
+			\begin{array}{l}
+			a_v^k=\text{AGGREGATE}^k\left\{H_u^{k-1}: u \in N(v)\right\} \\
+			H_v^k=\mathbf{COMBINE}^k\left\{H_v^{k-1}, a_v^k\right\},
+			\end{array}
+			$$
+		\item $N(v)$: neighborhood of node $v$
+		\item \textbf{AGGREGATE} could be: \textbf{sum}, \textbf{mean}, \textbf{max}, \textbf{min}, \textbf{attention}, etc.
+		\item \textbf{COMBINE} could be: \textbf{concatenation}, \textbf{addition}, \textbf{neural network}, etc.
+		\item Several architecture are proposed, changing the \textbf{AGGREGATE} and \textbf{COMBINE} functions:
 		\begin{itemize}
-			\item 
+			\item Graph Convolutional Networks (GCN)~\cite{kipf2016semi}
+			\item Graph SAGE~\cite{hamilton2017inductive}
 		\end{itemize}
 	\end{itemize}
 \end{frame}
+
+\begin{frame}[fragile]{GNN structure \& dynamics}
+	\includegraphics[width=\textwidth]{img/example-gnn.png}
+	\begin{itemize}
+		\item Aggregate computing execution model perspective:
+		\begin{itemize}
+			\item GNN updates the node representations in a \textbf{parallely} {\textcolor{darkcyan}\faThumbsUp} but globally synchronized {\textcolor{bolognafcred}\faThumbsDown}
+			\begin{itemize}
+				\item[{\textcolor{darkcyan}\faThumbsUp}] Despite that, GNN could be use for distributed computing
+			\end{itemize} 
+			\item Stacking several layers of GNNs, lead to several hops of information propagation
+			\begin{itemize}
+				\item Therefore, we could use at most one layer \faArrowRight \, no deep structure for graph representation
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
 %===============================================================================
 \section{Aggregate Computing + Neural Networks}
 %===============================================================================
@@ -177,7 +231,6 @@
 \begin{frame}[c,noframenumbering, allowframebreaks]{\refname}
 %\begin{frame}[t,allowframebreaks,noframenumbering]{\refname}
 	\tiny
-	\nocite{*}
 	\printbibliography
 \end{frame}
 %/////////
