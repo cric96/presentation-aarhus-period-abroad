@@ -85,7 +85,7 @@
 		\item Studying of spatio-temporal neural network models (forecast)
 		\begin{itemize}
 			\item Graph Neural Networks
-			\item Reccurrent Neural Networks
+			\item Recurrent Neural Networks
 			\item \emph{Recurrent Graph Neural Networks}
 		\end{itemize}
 		\item Training GNNs through PyTorch and data generated from Alchemist
@@ -97,6 +97,13 @@
 		\item Inside the cluster, compute the leader (bounded leader election)
 	\end{itemize}
 \end{itemize}
+\begin{alertblock}{Repositories}
+	\begin{itemize}
+		\item Data generation: \url{https://github.com/cric96/scala-boids}
+		\item Alchemist Simulation: \url{https://github.com/cric96/simulation-2022-aarhus-gnn-scafi}
+		\item Paper draft: \url{https://github.com/cric96/paper-2022-gnn-ac}
+	\end{itemize}	
+\end{alertblock}
 \end{frame}
 %===============================================================================
 
@@ -104,14 +111,14 @@
 \section{Graph Neural Networks}
 \begin{frame}{Artificial Neural Networks -- Recap}
 \begin{alertblock}{Definition}
-	Collection of units (also called \emph{artificial neuron}) that simulates the behavior of biological neurons
+	Collection of units (also called \emph{artificial neuron}) that simulates the behaviour of biological neurons
 	connected by weighted edges (also called \emph{synapses}).
 \end{alertblock}
 \begin{itemize}
 	\item Typical organization: \emph{input layer}, \emph{hidden layers}, \emph{output layer}
-	\item Each layer is composed by a set of neurons
+	\item Each layer is composed of a set of neurons
 	\item The output of each layer is computed as: $y = f(\sum_{i=1}^n w_i x_i)$ where $f$ is the activation function
-	\item The way in which the neurons are connected is called \emph{topology}
+	\item How the neurons are connected is called \emph{topology}
 	\item The are several topology types:
 	\begin{itemize}
 		\item Fully connected (MLP): standard neural network, used for classification and regression problem 
@@ -138,7 +145,7 @@
 		\item \emph{Representation learning}
 		\item \emph{Traffic forecast}~\scite{jiang2022graph}
 		\item Physics simulations~\scite{jiang2022graph}
-		\item Recommandation systems~\scite{wu2020graph}
+		\item Recommendation systems~\scite{wu2020graph}
 		\item Chemistry (Molecular fingerprint, chemical reaction)~\scite{zhou2020graph}
 		\item Stock market~\scite{matsunaga2019exploring}
 		\item Program verification~\scite{NEURIPS2019_49265d24}
@@ -155,15 +162,15 @@
 \begin{frame}{GNN structure \& dynamics}
 	\begin{itemize}
 		\item \bold{Idea}: iteratively update the node representations 
-		by combining the representations of their neighbors and their own representations
+		by combining the representations of their neighbours and their own representations
 		\item \bold{K}: layer of GNNs
 		\item \bold{$H^i$}: node representations at layer i ($H^0 = X$)
 		\item each layer:
 		\begin{itemize}
-			\item aggregate the information from the neighbors of each node (\textbf{AGGREGATE} phase) $\sim$ \bold{\lstinline|nbr|}
-			\item update the node representations by combining the aggregated information from neighbors with the current node representations (\textbf{COMBINE}) $\sim$ \bold{\lstinline|foldhood|}
+			\item aggregate the information from the neighbours of each node (\textbf{AGGREGATE} phase) $\sim$ \bold{\lstinline|nbr|}
+			\item updates the node representations by combining the aggregated information from neighbours with the current node representations (\textbf{COMBINE}) $\sim$ \bold{\lstinline|foldhood|}
 		\end{itemize}
-		\item Matematically:
+		\item Mathematically:
 			$$
 			\begin{array}{l}
 			a_v^k=\text{AGGREGATE}^k\left\{H_u^{k-1}: u \in N(v)\right\} \\
@@ -190,30 +197,30 @@
 	\begin{itemize}
 			\item GNN updates the node representations in a \textbf{parallely} {\textcolor{darkcyan}\faThumbsUp} but globally synchronized {\textcolor{bolognafcred}\faThumbsDown}
 			\begin{itemize}
-				\item Despite that, GNN could be use for distributed computing {\textcolor{darkcyan}\faThumbsUp}
+				\item Despite that, GNN could be used for distributed computing {\textcolor{darkcyan}\faThumbsUp}
 			\end{itemize} 
-			\item Stacking several layers of GNNs, lead to several hops of information propagation
+			\item Stacking several layers of GNNs lead to several hops of information propagation
 			\begin{itemize}
 				\item Therefore, we could use at most one layer \faArrowRight \, no deep structure for graph representation
 			\end{itemize}
-			\item If we consider node-wise computation, GNNs processing does not depend on neighborhood size {\textcolor{darkcyan}\faThumbsUp}
+			\item If we consider node-wise computation, GNNs processing does not depend on neighbourhood size {\textcolor{darkcyan}\faThumbsUp}
 			\item \emph{Learning process}: Centralised Training and Decentralised Execution (CTDE) approach:
 			\begin{itemize}
 				\item Gather several `snapshots' of the aggregate systems as a graphs
 				\begin{itemize}
 					\item Features of the nodes: the state of the nodes (sensors, etc.)
-					\item Weight of the edges: distances, metric, neighborhood data, etc.
+					\item Weight of the edges: distances, metrics, neighbourhood data, etc.
 				\end{itemize}
 				\item Train a GNN on the gathered graphs
 				\item `Deploy' the GNN on the aggregate systems
 				\begin{itemize}
-					\item Each node executes the GNN locally sharing the same parameters (homegenous behaviour)
+					\item Each node executes the GNN locally sharing the same parameters (homogenous behaviour)
 				\end{itemize}
 			\end{itemize}
 			\item Potential limitations:
 			\begin{itemize}
-				\item Synchronized update \faArrowRight \, each node should wait the update of its neighbors
-				\item Dynamic graph: GNN learn structural relation, no temporal relation (e.g., neighborhood changes, etc.)
+				\item Synchronized update \faArrowRight \, each node should wait for the update of its neighbours
+				\item Dynamic graph: GNN learn structural relation, no temporal relation (e.g., neighbourhood changes, etc.)
 			\end{itemize}
 		\end{itemize}
 \end{frame}
@@ -224,7 +231,7 @@
 		\item connection doesn't change over time
 		\item single snapshot of the graph is enough to predict the label
 	\end{itemize}
-	\item Recent works try to use GNN for timeseries prediction \faArrowRight \, spatio temporal neural networks
+	\item Recent works try to use GNN for time-series prediction \faArrowRight \, spatiotemporal neural networks
 	\begin{itemize}
 		\item Distributed controller for robots ~\scite{tolstaya2020learning}
 		\item Trafic forecast~\scite{zhao2019t}
@@ -233,7 +240,7 @@
 	\item Simple Idea: stack GNN structure with a recurrent neural network (RNN) -- or network with memory capabilities
 	\item Conceptually, the RNN could be applied in each node performing a local update on its own state
 	\begin{itemize}
-		\item The state depends on the neighborhood since it is the outpud of the GNN
+		\item The state depends on the neighbourhood since it is the output of the GNN
 	\end{itemize}	
 	\centering
 \end{itemize}
@@ -249,7 +256,7 @@
 	\begin{itemize}
 		\item Some of them should be carefully considered (how to deal with time series? how to deal with graphs?)
 	\end{itemize}
-	\item In the following, we consider a general schema in how to applied NNs in AC
+	\item In the following, we consider a general schema in how to apply NNs in AC
 	\item I don't cover the learning process -- I consider that it is already done using an external process
 	\begin{itemize}
 		\item \mintinline{scala}|sense("feature")| get the feature of interest
@@ -264,7 +271,7 @@ def main() = NN(sense("feature"))
 \end{minted}
 \end{alertblock}
 \begin{alertblock}{RNN}
-Similarly as MLP, but you need to use \mintinline{scala}|rep| to encode the temporal aspect
+Similar to MLP, but you need to use \mintinline{scala}|rep| to encode the temporal aspect
 \begin{minted}{scala}
 def main() = 
 	rep(default){
@@ -273,14 +280,14 @@ def main() =
 \end{minted}
 \end{alertblock}
 \begin{alertblock}{GNN}
-	In this case case you need to use \mintinline{scala}|nbr| in order to build the local graph-view
+	In this case you need to use \mintinline{scala}|nbr| in order to build the local graph-view
 \begin{minted}{scala}
 def main() = 
 	val neighborhoodFeature = includingSelf(nbr(sense("feature")))
 	val neighborhoodWeight = excludingSelf(nbrData)
 	NN(neighborhoodFeature, neighborhoodWeight)
 \end{minted}
-NB! The order of the feature vector and the weigtht should be preserved
+NB! The order of the feature vector and the weight should be preserved
 \end{alertblock}
 \begin{alertblock}{GNN \faPlus \, RNN}
 	You need to use \mintinline{scala}|rep| and \mintinline{scala}|nbr| in order to build the local graph-view with memory
@@ -294,19 +301,152 @@ def main() =
 			NN(neighborhoodFeature, neighborhoodWeight, nbrMemory)
 	}
 \end{minted}
-NB! Some NNs use as input the neighborhood memory information
+NB! Some NNs use as input the neighbourhood memory information
 \end{alertblock}
 \end{frame}
 
 %===============================================================================
-\section{Use case: spatio temporal forecast + tracking}
+\section{Use case: Spatio-temporal forecast + tracking}
 %===============================================================================
+\begin{frame}{Use case: spatio temporal forecast + tracking}
+\begin{alertblock}{General Idea}
+	A Cyber Physical Swarms (CPSWs) are used to track a moving phenomenon. The nodes should:
+	\begin{itemize}
+		\item Cover the area (coverage) \faArrowRight \, AC
+		\item Follow the phenomenon (tracking) \faArrowRight \, AC
+		\item Predict the future position of the phenomenon (forecast) in order to improve the tracking \faArrowRight \, GNN + RNN
+	\end{itemize}
+\end{alertblock}
+\begin{alertblock}{Scenario: wildfire tracking}
+	A swarm of drone are deployed in a forest to monitor wildfires. 
+	Each drone is equipped with a camera and a sensor to measure the temperature. 
+	The goal is to track the fire (i.e., moving and following it) and predict its evolution.
+\end{alertblock}
+\end{frame}
+\begin{frame}{Training Process}
+\begin{itemize}
+	\item We follow a CTDE approach
+	\item The data are generated using Alchemist simulations\footnote{\url{https://github.com/cric96/simulation-2022-aarhus-gnn-scafi}}
+	\begin{itemize}
+		\item It creates a density map from a set of boids that moves in a 2D space using flocking models
+		\item A grid of nodes senses the perceived density 
+		\item A \emph{snapshot} is captured each \emph{dt} time units \faArrowRight \, it creates a graph in which the labels are related to the density, and the weights are related to the distance (metric)
+		\item  Therefore, for each simulation we have a sequence of graphs
+	\end{itemize}
+	\item The training process is done using a \emph{supervised learning} approach (using PyTorch)
+	\begin{itemize}
+		\item Given a certain snapshot, the ground truth consists of the next $K$ snapshots
+		\item Loss function is the MSE between the predicted and the ground truth
+	\item We test several models, focusing on the spatial and temporal aspect
+	\begin{itemize}
+		\item Does the neighbourhood size affect the performance of the prediction? 
+		\item Is the temporal axis enough to get a good prediction?
+		\item Is the spatial axis enough to get a good prediction?
+	\end{itemize}
+	\end{itemize}
+	\item \emph{Current result}
+	\begin{itemize}
+		\item Using only spatial information led to bad predictions
+		\item Using only temporal information led to good predictions
+		\item The best solution is the one in which we use both spatio and temporal data (with only one hop)
+	\end{itemize}
 
+\end{itemize}
+\end{frame}
+\begin{frame}{Training Process: Class diagram}
+\centering
+\includegraphics[height=0.9\textheight]{img/structure-training.png}
+\end{frame}
 
+\begin{frame}[fragile]{Tracking}
+\begin{itemize}
+	\item The nodes follow the phenomenon using a window of perception
+	\begin{itemize}
+		\item A possible AC approach: past perceptions stored in a memory (e.g., a queue):
+		\begin{minted}{scala}
+		rep(Queue.empty[Double]) { memory => memory :+ sense("perception") }
+		\end{minted}
+		\item Proposed approach: using forecast produced from \mintinline{scala}{DensityForecast}
+	\end{itemize} 
+	\item The nodes compute the partial derivative of the density with respect to their local neighbourhood
+	\begin{itemize}
+		\item Similar to the idea of dense motion field/optical flow~\scite{verri1989motion} in computer vision
+		\item It produces a field of delta movements (i.e., a potential field)
+	\end{itemize}
+	\item The nodes should also maximize the coverage
+	\begin{itemize}
+		\item they have a force $F$ that is proportional to the neighbourhood \faArrowRight \, if there are too many nodes, they came back to their original position 
+	\end{itemize}
+\end{itemize}
+\centering
+{
+\includegraphics[width=0.3\textwidth]{img/step-1.png}
+\includegraphics[width=0.3\textwidth]{img/step-2.png}
+\includegraphics[width=0.3\textwidth]{img/step-3.png}
+}
+\end{frame}
+\begin{frame}{Evaluation}
+	\begin{itemize}
+		\item \bold{Goal}: verifying the improvement in using the forecast w.r.t. the historical information
+		\item \bold{Metrics to consider}:
+		\begin{itemize}
+			\item \emph{Coverage}: the percentage of nodes that are in the area of interest
+			\item \emph{Tracking}: the percentage of nodes that are in the area of interest and are following the phenomenon
+		\end{itemize}
+		\item we expect that, using forecast, the \emph{Coverage} and the \emph{Tracking} metric should be maximised.
+		\item \emph{How to compute the metrics?}
+		\begin{itemize}
+			\item \emph{Coverage}: each node has a radius of perception, the coverage is the area of interest divided by the intersection of the area covered by the nodes
+			\item \emph{Tracking}: compute the density map from the nodes, and compare it with the ground truth
+		\end{itemize}
+		\item Current status: we are still working on the evaluation process
+		\begin{itemize}
+			\item The neural networks produced by Python are already compatible with ScaFi (thanks to ScalaPy)
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+\begin{frame}{Spatio Temporal Tracking - Activities recap}
+\begin{itemize}
+	\item[{\textcolor{darkcyan}\faThumbsUp}] Generate synthetic data
+	\item[{\textcolor{darkcyan}\faThumbsUp}] Create common interface for several neural network models
+	\item[{\textcolor{darkcyan}\faThumbsUp}] Setup training process
+	\item[{\textcolor{darkcyan}\faThumbsUp}] Integrating neural network in ScaFi
+	\item[{\textcolor{darkcyan}\faThumbsUp}] Setup the simulation 
+	\item[\faQuestion] Evaluating the training process with the different models
+	\item[\faThumbsDown] Computing the metric in both scenarios (forecast vs historical)
+	\item[\faThumbsDown] Comparing the result
+	\item[\faQuestion] Set up the simulation using real data (e.g., the one from Toronto?)
+\end{itemize}
+\end{frame}
 %===============================================================================
 \section{Clustering}
+\begin{frame}{Clustering: draft}
+\begin{itemize}
+	\item In CPSWs, the nodes are often organized in clusters
+	\begin{itemize}
+		\item Task-division: each cluster is responsible for a different task (e.g., aggregate processes or predefined cluster as in Buzz)
+		\item Partitioning the space: each cluster is responsible for a different area (block S)
+		\item Phenomenon tracking: clusters follow a certain environment phenomenon	(swarm-based clustering~\scite{})
+	\end{itemize}
+	\item In order to form areas, we typically leverage a leader election process:
+	\begin{itemize}
+		\item In swarm clustering: the centre (leader) depends on a local minimum
+		\item In S: the leader is elected using the grain and a symmetry-breaking process
+	\end{itemize}
+	\item Another approach: try to form a cluster without a centre
+	\begin{itemize}
+		\item The leader process could be performed inside the cluster
+	\end{itemize}
+	\item preliminary idea: using a majority voting role \faPlus \, random colouring process
+	\begin{itemize}
+		\item The colour (i.e., the cluster ID) depends on the majority of the neighbour's colour. If there is no majority, the colour is randomly chosen
+		\item Benefit: the cluster doesn't depend on a node but is continuously updated but the elements of the cluster
+	\end{itemize}
+	\centering
+	\includegraphics[width=0.6\textwidth]{img/clustering.png}
+\end{itemize}
+\end{frame}
 %===============================================================================
-
 
 %===============================================================================
 \section*{}
