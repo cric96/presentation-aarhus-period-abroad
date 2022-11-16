@@ -82,7 +82,7 @@
 	\item \bold{Main idea}: spatio-temporal tracking of a natural phenomenon
 	\begin{itemize}
 		\item Generation of synthetic data (moving boids)
-		\item Studying of spatio-temporal neural network models (forecast)
+		\item Study of spatio-temporal neural network models (forecast)
 		\begin{itemize}
 			\item Graph Neural Networks
 			\item Recurrent Neural Networks
@@ -90,7 +90,7 @@
 		\end{itemize}
 		\item Training GNNs through PyTorch and data generated from Alchemist
 		\item Integrate Neural networks with Aggregate Computing
-		\item Use forecast to compute the best path for nodes
+		\item Use forecasts to compute the best path for nodes
 	\end{itemize}
 	\item \bold{Clustering}: continue the idea of swarm-based clustering -- avoid the leader election phase
 	\begin{itemize}
@@ -111,17 +111,17 @@
 \section{Graph Neural Networks}
 \begin{frame}{Artificial Neural Networks -- Recap}
 \begin{alertblock}{Definition}
-	Collection of units (also called \emph{artificial neuron}) that simulates the behaviour of biological neurons
+	Collection of units (also called \emph{artificial neurons}) that simulates the behaviour of biological neurons
 	connected by weighted edges (also called \emph{synapses}).
 \end{alertblock}
 \begin{itemize}
 	\item Typical organization: \emph{input layer}, \emph{hidden layers}, \emph{output layer}
 	\item Each layer is composed of a set of neurons
 	\item The output of each layer is computed as: $y = f(\sum_{i=1}^n w_i x_i)$ where $f$ is the activation function
-	\item How the neurons are connected is called \emph{topology}
-	\item The are several topology types:
+	\item The \emph{topology} of a neural network devise how the neurons are connected
+	\item The are several topologies:
 	\begin{itemize}
-		\item Fully connected (MLP): standard neural network, used for classification and regression problem 
+		\item Fully connected (MLP): standard neural network, used for classification and regression problems 
 		\item Convolutional: used for image processing
 		\item Recurrent: used for time series prediction
 		\item \bold{Graph Neural Networks}: used for graph processing
@@ -138,11 +138,11 @@
 	\begin{itemize}
 		\item Node classification: given a graph $G=(V,E)$ and a set of labels $X$, predict the label of each node $v \in V$
 		\item Link regression: given a graph $G=(V,E)$ and a set of labels $X$, predict the label of each edge $(u,v) \in E$
-		\item Graph classification/regression: given a graph $G=(V,E)$ and a set of labels $X$, predict the label of the graph
+		\item Graph classification/regression: given a graph $G=(V,E)$ and a set of labels $X$, predict the label of the entire graph
 	\end{itemize}
 	\item \bold{Applications}
 	\begin{itemize}
-		\item \emph{Representation learning}
+		\item \emph{Representation learning}~\scite{hamilton2020graph}
 		\item \emph{Traffic forecast}~\scite{jiang2022graph}
 		\item Physics simulations~\scite{jiang2022graph}
 		\item Recommendation systems~\scite{wu2020graph}
@@ -151,7 +151,7 @@
 		\item Program verification~\scite{NEURIPS2019_49265d24}
 		\item ...
 	\end{itemize}
-	\item Amazing gentle introduction: 
+	\item Amazing gentle introduction of the GNN: 
 	\begin{itemize}
 		\item \url{https://distill.pub/2021/gnn-intro/}
 		\item \url{https://tkipf.github.io/graph-convolutional-networks/}
@@ -161,8 +161,8 @@
 
 \begin{frame}{GNN structure \& dynamics}
 	\begin{itemize}
-		\item \bold{Idea}: iteratively update the node representations 
-		by combining the representations of their neighbours and their own representations
+		\item \bold{Idea}: iteratively, the network updates the node representations 
+		by combining the representations of their neighbours and their local representations
 		\item \bold{K}: layer of GNNs
 		\item \bold{$H^i$}: node representations at layer i ($H^0 = X$)
 		\item each layer:
@@ -260,7 +260,7 @@
 	\item I don't cover the learning process -- I consider that it is already done using an external process
 	\begin{itemize}
 		\item \mintinline{scala}|sense("feature")| get the feature of interest
-		\item \mintinline{scala}|nbrData| get the associated with the weighted neighborhood
+		\item \mintinline{scala}|nbrData| get some data from the neighbours related to the edge's weight (e.g., distance, etc.)
 		\item \mintinline{scala}|NN| is the function associated with the neural network
 	\end{itemize}
 \end{itemize}
@@ -310,7 +310,7 @@ NB! Some NNs use as input the neighbourhood memory information
 %===============================================================================
 \begin{frame}{Use case: spatio temporal forecast + tracking}
 \begin{alertblock}{General Idea}
-	A Cyber Physical Swarms (CPSWs) are used to track a moving phenomenon. The nodes should:
+	Cyber Physical Swarms (CPSWs) are used to track moving phenomena. The nodes should:
 	\begin{itemize}
 		\item Cover the area (coverage) \faArrowRight \, AC
 		\item Follow the phenomenon (tracking) \faArrowRight \, AC
@@ -328,9 +328,9 @@ NB! Some NNs use as input the neighbourhood memory information
 	\item We follow a CTDE approach
 	\item The data are generated using Alchemist simulations\footnote{\url{https://github.com/cric96/simulation-2022-aarhus-gnn-scafi}}
 	\begin{itemize}
-		\item It creates a density map from a set of boids that moves in a 2D space using flocking models
-		\item A grid of nodes senses the perceived density 
-		\item A \emph{snapshot} is captured each \emph{dt} time units \faArrowRight \, it creates a graph in which the labels are related to the density, and the weights are related to the distance (metric)
+		\item It creates a density map from a set of boids. They are moving in a 2D space using flocking models
+		\item A grid of nodes senses the local density 
+		\item A \emph{snapshot} is captured with a certain frequency \faArrowRight \, it creates a graph in which the labels are related to the density, and the weights are related to the distance (metric)
 		\item  Therefore, for each simulation we have a sequence of graphs
 	\end{itemize}
 	\item The training process is done using a \emph{supervised learning} approach (using PyTorch)
